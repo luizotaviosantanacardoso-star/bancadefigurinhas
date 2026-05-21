@@ -1,0 +1,8 @@
+{
+  "name": "loja-figurinhas-2026",
+  "version": "1.0.0",
+  "type": "module",
+  "engines": {
+    "node": "18.x"
+  }
+}
