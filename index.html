@@ -1,0 +1,408 @@
+Aqui está o código completo do seu site atualizado. Foram integradas as novas imagens enviadas (utilizando os nomes de arquivo correspondentes para o logotipo e o banner principal) e adicionadas animações suaves via CSS para os cartões de produtos, notificações de compra e elementos interativos, mantendo toda a estrutura original e os recursos de segurança intactos.
+
+```html
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Banking Figurinhas | Oficial Copa 2026</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root { 
+            --panini-red: #e30613; 
+            --banking-blue: #003399;
+        }
+        body { background-color: #f8f9fa; font-family: sans-serif; overflow-x: hidden; }
+        .nav-top { background-color: var(--panini-red); }
+        .btn-buy { background-color: var(--panini-red); transition: all 0.3s ease; }
+        .btn-buy:hover { background-color: #b3050f; transform: scale(1.03); box-shadow: 0 4px 12px rgba(227, 6, 19, 0.2); }
+        
+        /* Animação e Estilo dos Cards de Produtos */
+        .product-card { 
+            background: white; 
+            border-radius: 12px; 
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); 
+            border: 1px solid #eee; 
+            display: flex; 
+            flex-direction: column; 
+            height: 100%; 
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.6s forwards;
+        }
+        .product-card:hover { 
+            box-shadow: 0 20px 35px rgba(0,0,0,0.08); 
+            transform: translateY(-8px); 
+            border-color: #ddd;
+        }
+        .img-box { height: 220px; padding: 20px; display: flex; align-items: center; justify-content: center; background: #fff; border-radius: 12px 12px 0 0; overflow: hidden; }
+        .img-box img { max-height: 100%; max-width: 100%; object-fit: contain; transition: transform 0.4s ease; }
+        .product-card:hover .img-box img { transform: scale(1.06); }
+        .price-tag { color: var(--panini-red); font-size: 1.6rem; font-weight: 800; }
+        
+        /* Modais e Efeitos */
+        .modal { 
+            display: none; 
+            position: fixed; 
+            z-index: 1000; 
+            left: 0; 
+            top: 0; 
+            width: 100%; 
+            height: 100%; 
+            background: rgba(0,0,0,0.6); 
+            backdrop-filter: blur(6px); 
+            overflow-y: auto; 
+            transition: all 0.3s ease;
+        }
+        
+        /* Animações CSS */
+        @keyframes fadeInUp {
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+        
+        /* Notificação Flutuante Personalizada */
+        .toast-notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #10B981;
+            color: white;
+            padding: 16px 24px;
+            border-radius: 8px;
+            font-weight: bold;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: slideInRight 0.3s cubic-bezier(0.16, 1, 0.3, 1), fadeOut 0.3s 2.7s forwards;
+        }
+
+        /* Delays para carregamento sequencial dos produtos */
+        .card-0 { animation-delay: 0.1s; }
+        .card-1 { animation-delay: 0.2s; }
+        .card-2 { animation-delay: 0.3s; }
+        .card-3 { animation-delay: 0.4s; }
+        .card-4 { animation-delay: 0.5s; }
+        .card-5 { animation-delay: 0.6s; }
+    </style>
+</head>
+<body>
+
+    <header class="shadow-sm sticky top-0 z-50 bg-white">
+        <div class="nav-top text-white text-[10px] py-1.5 text-center font-bold uppercase tracking-widest">
+            BANKING FIGURINHAS - DISTRIBUIDOR OFICIAL COPA 2026
+        </div>
+        <nav class="px-6 py-3 border-b">
+            <div class="container mx-auto flex justify-between items-center">
+                <a href="#" class="flex items-center">
+                    <img src="ChatGPT Image 14 de mai. de 2026, 14_14_34.png" alt="Banking Figurinhas Logo" class="h-14 w-auto object-contain">
+                </a>
+                <button onclick="abrirCheckout()" class="flex items-center space-x-2 bg-gray-100 px-5 py-2.5 rounded-full hover:bg-gray-200 transition active:scale-95">
+                    <i class="fas fa-shopping-cart text-gray-700"></i>
+                    <span id="cart-count" class="font-bold text-red-600 bg-red-100 px-2 py-0.5 rounded-full text-xs">0</span>
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <section class="w-full bg-white border-b overflow-hidden">
+        <div class="container mx-auto">
+            <img src="ChatGPT Image 14 de mai. de 2026, 14_10_20.png" alt="Sua coleção, nossa paixão!" class="w-full h-auto object-cover max-h-[480px] mx-auto">
+        </div>
+    </section>
+
+    <section class="bg-gray-50 py-5 border-b text-sm text-gray-600 shadow-inner">
+        <div class="container mx-auto px-4 grid grid-cols-1 sm:grid-cols-3 gap-6 text-center">
+            <div class="flex items-center justify-center space-x-3 bg-white p-3 rounded-lg shadow-sm border border-gray-100">
+                <i class="fas fa-shield-alt text-green-600 text-xl"></i>
+                <span class="text-left text-xs md:text-sm"><strong>Ambiente Seguro:</strong><br><span class="text-gray-400">Seus dados 100% protegidos</span></span>
+            </div>
+            <div class="flex items-center justify-center space-x-3 bg-white p-3 rounded-lg shadow-sm border border-gray-100">
+                <i class="fas fa-bolt text-yellow-500 text-xl"></i>
+                <span class="text-left text-xs md:text-sm"><strong>Envio Imediato:</strong><br><span class="text-gray-400">Código de rastreio em minutos</span></span>
+            </div>
+            <div class="flex items-center justify-center space-x-3 bg-white p-3 rounded-lg shadow-sm border border-gray-100">
+                <i class="fas fa-headset text-blue-600 text-xl"></i>
+                <span class="text-left text-xs md:text-sm"><strong>Suporte 24/7:</strong><br><span class="text-gray-400">Atendimento completo pós-venda</span></span>
+            </div>
+        </div>
+    </section>
+
+    <main class="container mx-auto py-12 px-4">
+        <h2 class="text-3xl font-black text-gray-800 mb-10 italic uppercase border-l-8 border-red-600 pl-4 tracking-tight">Loja Oficial 2026</h2>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            
+            <div class="product-card card-0">
+                <div class="img-box"><img src="543005z.jpg" alt="Envelope"></div>
+                <div class="p-6 flex-grow text-center flex flex-col justify-between">
+                    <div>
+                        <h4 class="font-bold text-lg text-gray-800 uppercase tracking-tight">Envelope de Figurinhas</h4>
+                        <p class="text-sm text-gray-500 mb-4">Contém 7 figurinhas oficiais.</p>
+                    </div>
+                    <div>
+                        <div class="price-tag mb-4">R$ 5,80</div>
+                        <button onclick="add('Envelope (7 fig.)', 5.80)" class="btn-buy w-full text-white font-bold py-3 rounded-lg uppercase text-sm">Adicionar</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="product-card card-1">
+                <div class="img-box"><img src="518-zyN1SnL._AC_UF350,350_QL80_.jpg" alt="Kit 40"></div>
+                <div class="p-6 flex-grow text-center flex flex-col justify-between">
+                    <div>
+                        <h4 class="font-bold text-lg text-gray-800 uppercase tracking-tight">Kit 40 Envelopes</h4>
+                        <p class="text-sm text-gray-500 mb-4">Total de 280 figurinhas oficiais.</p>
+                    </div>
+                    <div>
+                        <div class="price-tag mb-4">R$ 229,99</div>
+                        <button onclick="add('Kit 40 Envelopes', 229.99)" class="btn-buy w-full text-white font-bold py-3 rounded-lg uppercase text-sm">Adicionar</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="product-card card-2 border-2 border-yellow-400 relative">
+                <div class="absolute top-3 right-3 z-10">
+                    <span class="text-[10px] bg-yellow-400 text-black font-black px-2.5 py-1 rounded shadow uppercase tracking-wider">Especial</span>
+                </div>
+                <div class="img-box"><img src="box-album-copa_d1bk.jpg" alt="Box"></div>
+                <div class="p-6 flex-grow text-center flex flex-col justify-between">
+                    <div>
+                        <h4 class="font-bold text-lg text-gray-800 mt-1 uppercase tracking-tight">Box Colecionador + 40 Env.</h4>
+                        <p class="text-sm text-gray-500 mb-4">Edição exclusiva com caixa rígida.</p>
+                    </div>
+                    <div>
+                        <div class="price-tag mb-4">R$ 319,99</div>
+                        <button onclick="add('Box Colecionador', 319.99)" class="btn-buy w-full text-white font-bold py-3 rounded-lg uppercase text-sm">Adicionar</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="product-card card-3">
+                <div class="img-box"><img src="D_NQ_NP_877838-MLA109933216519_042026-O.webp" alt="Capa Mole"></div>
+                <div class="p-6 flex-grow text-center flex flex-col justify-between">
+                    <div>
+                        <h4 class="font-bold text-lg text-gray-800 uppercase tracking-tight">Álbum Capa Mole</h4>
+                        <p class="text-sm text-gray-500 mb-4">Versão brochura oficial.</p>
+                    </div>
+                    <div>
+                        <div class="price-tag mb-4">R$ 26,99</div>
+                        <button onclick="add('Álbum Capa Mole', 26.99)" class="btn-buy w-full text-white font-bold py-3 rounded-lg uppercase text-sm">Adicionar</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="product-card card-4">
+                <div class="img-box"><img src="B1-4349113-4356497_1.webp" alt="Álbum Prata"></div>
+                <div class="p-6 flex-grow text-center flex flex-col justify-between">
+                    <div>
+                        <h4 class="font-bold text-lg text-gray-800 uppercase tracking-tight">Álbum Capa Dura Prata</h4>
+                        <p class="text-sm text-gray-500 mb-4">Edição Prata + 12 envelopes inclusos.</p>
+                    </div>
+                    <div>
+                        <div class="price-tag mb-4">R$ 65,99</div>
+                        <button onclick="add('Álbum Prata', 65.99)" class="btn-buy w-full text-white font-bold py-3 rounded-lg uppercase text-sm">Adicionar</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="product-card card-5">
+                <div class="img-box"><img src="D_NQ_NP_721313-MLB107518374125_022026-O.webp" alt="Capa Dura"></div>
+                <div class="p-6 flex-grow text-center flex flex-col justify-between">
+                    <div>
+                        <h4 class="font-bold text-lg text-gray-800 uppercase tracking-tight">Álbum Capa Dura</h4>
+                        <p class="text-sm text-gray-500 mb-4">Proteção premium para a coleção.</p>
+                    </div>
+                    <div>
+                        <div class="price-tag mb-4">R$ 63,99</div>
+                        <button onclick="add('Álbum Capa Dura', 63.99)" class="btn-buy w-full text-white font-bold py-3 rounded-lg uppercase text-sm">Adicionar</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <section class="mt-24 max-w-4xl mx-auto">
+            <h3 class="text-2xl font-bold text-gray-800 mb-8 text-center uppercase tracking-tight">Perguntas Frequentes</h3>
+            <div class="space-y-4">
+                <div class="bg-white p-5 rounded-lg border transition hover:border-gray-300">
+                    <h5 class="font-bold text-gray-800 flex items-center"><i class="fas fa-question-circle text-red-600 mr-2"></i> Os produtos são originais?</h5>
+                    <p class="text-gray-600 text-sm mt-2">Sim, trabalhamos apenas com produtos 100% originais da Copa de 2026 adquiridos diretamente na distribuição oficial.</p>
+                </div>
+                <div class="bg-white p-5 rounded-lg border transition hover:border-gray-300">
+                    <h5 class="font-bold text-gray-800 flex items-center"><i class="fas fa-question-circle text-red-600 mr-2"></i> Qual o prazo de envio do código de rastreio?</h5>
+                    <p class="text-gray-600 text-sm mt-2">Logo após a confirmação do pagamento via Pix, os dados do pedido e o link de acompanhamento logístico são enviados automaticamente para o seu e-mail cadastrado.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div id="checkoutModal" class="modal">
+        <div class="bg-white mx-auto my-10 p-8 rounded-xl shadow-2xl max-w-lg w-11/12 relative transition-all transform scale-95 duration-300">
+            <button onclick="fecharCheckout()" class="absolute top-4 right-4 text-gray-400 hover:text-red-500 text-2xl transition">×</button>
+            <h2 class="text-2xl font-black mb-6 border-b pb-4 text-gray-800 uppercase italic">Seu Carrinho</h2>
+            <div id="listaCheckout" class="space-y-3 mb-6 max-h-48 overflow-y-auto border-b pb-4 text-sm font-bold"></div>
+            <div class="flex justify-between font-black text-xl mb-6 text-red-600">
+                <span>TOTAL:</span>
+                <span>R$ <span id="totalFinal">0,00</span></span>
+            </div>
+            
+            <div id="payment-area">
+                <div class="flex items-center justify-center space-x-2 text-xs text-green-600 bg-green-50 p-2.5 rounded mb-4 font-bold">
+                    <i class="fas fa-lock"></i>
+                    <span>Checkout criptografado e 100% protegido</span>
+                </div>
+
+                <form onsubmit="finalizar(event)" class="space-y-4">
+                    <input type="text" id="n" placeholder="Nome Completo" required class="w-full p-3 border rounded-lg outline-none focus:border-red-500 transition">
+                    <input type="text" id="c" placeholder="CPF (Apenas números)" required maxlength="11" oninput="this.value = this.value.replace(/[^0-9]/g, '')" class="w-full p-3 border rounded-lg outline-none focus:border-red-500 transition">
+                    <input type="email" id="e" placeholder="E-mail para atualizações do pedido" required class="w-full p-3 border rounded-lg outline-none focus:border-red-500 transition">
+                    <button type="submit" id="btn-finalizar" class="w-full bg-green-600 text-white font-bold py-4 rounded-lg uppercase tracking-widest hover:bg-green-700 transition active:scale-[0.98] shadow-lg">
+                        Finalizar e Gerar Pix
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-gray-900 text-gray-400 text-xs py-12 mt-24 border-t-4 border-red-600">
+        <div class="container mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div>
+                <h4 class="text-white font-black text-lg mb-4 italic tracking-tight">BANKING<span class="text-blue-500">FIGURINHAS</span></h4>
+                <p class="mb-2">Distribuição autorizada de colecionáveis oficiais.</p>
+                <p>Termos de Uso | Políticas de Privacidade</p>
+            </div>
+            <div>
+                <h5 class="text-white font-bold mb-4 uppercase tracking-wider">Formas de Pagamento</h5>
+                <div class="flex space-x-4 text-2xl text-gray-300">
+                    <i class="fab fa-pix text-teal-400" title="Pix"></i>
+                    <i class="fas fa-barcode" title="Boleto Bancário"></i>
+                    <i class="fab fa-cc-visa" title="Visa"></i>
+                    <i class="fab fa-cc-mastercard" title="Mastercard"></i>
+                </div>
+            </div>
+            <div>
+                <h5 class="text-white font-bold mb-4 uppercase tracking-wider">Segurança & Selos</h5>
+                <div class="flex flex-wrap gap-2">
+                    <span class="bg-gray-800 text-green-400 border border-green-900 px-2.5 py-1.5 rounded font-bold uppercase tracking-wider text-[10px] flex items-center">
+                        <i class="fas fa-shield-alt mr-1.5"></i> Google Safe Browsing
+                    </span>
+                    <span class="bg-gray-800 text-blue-400 border border-blue-900 px-2.5 py-1.5 rounded font-bold uppercase tracking-wider text-[10px] flex items-center">
+                        <i class="fas fa-certificate mr-1.5"></i> SSL Criptografado
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class="container mx-auto px-6 mt-8 pt-8 border-t border-gray-800 text-center text-gray-500">
+            <p>© 2026 BANKING FIGURINHAS LTDA. CNPJ: 00.000.000/0001-00. Todos os direitos reservados.</p>
+        </div>
+    </footer>
+
+    <div id="toast-container"></div>
+
+    <script>
+        let cart = [];
+        let total = 0;
+
+        // Substituição do alert nativo por uma notificação flutuante suave com temporizador
+        function showNotification(message) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = 'toast-notification';
+            toast.innerHTML = `<i class="fas fa-check-circle text-lg"></i> <span>${message}</span>`;
+            container.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }
+
+        function add(nome, preco) {
+            cart.push({nome, preco});
+            total += preco;
+            document.getElementById('cart-count').innerText = cart.length;
+            showNotification(nome + " adicionado ao carrinho!");
+        }
+
+        function abrirCheckout() {
+            if(cart.length === 0) return alert('Seu carrinho está vazio!');
+            const lista = document.getElementById('listaCheckout');
+            lista.innerHTML = cart.map(i => `<div class="flex justify-between py-1 border-b border-gray-50"><span>${i.nome}</span><span>R$ ${i.preco.toFixed(2).replace('.', ',')}</span></div>`).join('');
+            document.getElementById('totalFinal').innerText = total.toFixed(2).replace('.', ',');
+            
+            const modal = document.getElementById('checkoutModal');
+            modal.style.display = 'block';
+            setTimeout(() => {
+                modal.querySelector('div').style.transform = 'scale(1)';
+            }, 50);
+        }
+
+        function fecharCheckout() { 
+            const modal = document.getElementById('checkoutModal');
+            modal.querySelector('div').style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                modal.style.display = 'none'; 
+            }, 150);
+        }
+
+        async function finalizar(e) {
+            e.preventDefault();
+            const btn = document.getElementById('btn-finalizar');
+            const cpfRaw = document.getElementById('c').value;
+
+            if (cpfRaw.length !== 11) return alert("O CPF deve ter 11 números.");
+
+            btn.innerText = "GERANDO PIX...";
+            btn.disabled = true;
+
+            try {
+                const response = await fetch('/api/finalizar', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        nome: document.getElementById('n').value,
+                        cpf: cpfRaw,
+                        email: document.getElementById('e').value,
+                        total: total
+                    })
+                });
+
+                const res = await response.json();
+
+                if (res.pix_qr_code) {
+                    document.getElementById('payment-area').innerHTML = `
+                        <div class="text-center p-2 animate-[fadeInUp_0.4s_ease-out]">
+                            <h2 class="text-xl font-bold text-green-600 mb-4 flex items-center justify-center gap-2"><i class="fas fa-qrcode"></i> PIX GERADO!</h2>
+                            <img src="${res.pix_qr_code_url}" class="mx-auto mb-4 w-48 border p-2 bg-white rounded shadow-sm">
+                            <p class="text-[10px] font-bold text-gray-500 mb-2 uppercase tracking-wider">Copia e Cola:</p>
+                            <textarea readonly class="w-full p-2 border text-[10px] h-20 mb-4 bg-gray-50 rounded font-mono" onclick="this.select()">${res.pix_qr_code}</textarea>
+                            <button onclick="window.location.reload()" class="w-full bg-red-600 text-white font-bold py-3 rounded-lg uppercase text-sm hover:bg-red-700 transition">Voltar à Loja</button>
+                        </div>
+                    `;
+                } else {
+                    alert("Erro da Evopay: " + (res.message || "Dados Inválidos. Verifique o CPF."));
+                    btn.disabled = false;
+                    btn.innerText = "Finalizar e Gerar Pix";
+                }
+            } catch (err) {
+                alert("Erro de conexão com o servidor.");
+                btn.disabled = false;
+                btn.innerText = "Finalizar e Gerar Pix";
+            }
+        }
+    </script>
+</body>
+</html>
+
+```
